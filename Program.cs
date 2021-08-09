@@ -187,7 +187,7 @@ namespace SP_CSOM_DEMO2
         {
             try
             {
-                var secureString = new SecureString();
+                SecureString secureString = new SecureString();
                 foreach (char c in ConfigurationManager.AppSettings["SPOPassword"])
                 {
                     secureString.AppendChar(c);
