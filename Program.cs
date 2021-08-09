@@ -170,7 +170,6 @@ namespace SP_CSOM_DEMO2
                             ListItem listItem = list.GetItemById(itemId);
                             listItem.DeleteObject();
                             context.ExecuteQuery();
-                            Console.WriteLine();
                         }
                         catch (Exception e)
                         {
