@@ -13,9 +13,11 @@ namespace SP_CSOM_DEMO2
     {
         static void Main(string[] args)
         {
-            ClientContext context = new ClientContext(ConfigurationManager.AppSettings["SPOSite"]);
-            context.AuthenticationMode = ClientAuthenticationMode.Default;
-            context.Credentials = new SharePointOnlineCredentials(_getSPOUserName(), _getSPOSecureStringPassword());
+            ClientContext context = new ClientContext(ConfigurationManager.AppSettings["SPOSite"])
+            {
+                AuthenticationMode = ClientAuthenticationMode.Default,
+                Credentials = new SharePointOnlineCredentials(_getSPOUserName(), _getSPOSecureStringPassword())
+            };
             Web web = context.Web;
             context.Load(web);
             context.ExecuteQuery();
