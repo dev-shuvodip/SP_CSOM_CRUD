@@ -13,7 +13,11 @@ namespace SP_CSOM_DEMO2
         static void Main(string[] args)
         {
             ClientContext context = new ClientContext(ConfigurationManager.AppSettings["SPOSite"]);
-            List list = _initiateAuthentication(context);
+            List list = InitiateAuthentication(context);
+            Web web = context.Web;
+            context.Load(web);
+            context.ExecuteQuery();
+            Console.WriteLine($"Website Title : {web.Title}\nWebsite Url : {web.Url}\n\n");
             Console.WriteLine($"List name - {list.Title}\n\n");
 
             BasicConfigurator.Configure();
@@ -28,15 +32,15 @@ namespace SP_CSOM_DEMO2
                 switch (choice)
                 {
                     case 1:
-                        Log.Info("Entering case 1 - _retrieveRecords()");
-                        _retrieveRecords();
+                        Log.Info("Entering case 1");
+                        RetrieveRecords();
                         break;
                     case 2:
-                        Log.Info("Entering case 2 - _createRecord()");
-                        _createRecord();
+                        Log.Info("Entering case 2");
+                        CreateRecord();
                         break;
                     case 3:
-                        Log.Info("Entering case 3 - _updateRecord()");
+                        Log.Info("Entering case 3");
                         Console.WriteLine("Update a record - \n\n");
                         Console.WriteLine("List view\n\n");
                         CamlQuery query3 = CamlQuery.CreateAllItemsQuery(100);
@@ -51,11 +55,11 @@ namespace SP_CSOM_DEMO2
                         Console.WriteLine("Enter Id of the record to be updated - \n");
                         int itemId1 = Convert.ToInt32(Console.ReadLine());
                         Console.WriteLine();
-                        _updateRecord(itemId1);
+                        UpdateRecord(itemId1);
 
                         break;
                     case 4:
-                        Log.Info("Entering case 4 - _deleteRecord()");
+                        Log.Info("Entering case 4");
                         Console.WriteLine("Delete a record - \n\n");
                         Console.WriteLine("List view\n\n");
                         CamlQuery query4 = CamlQuery.CreateAllItemsQuery(100);
@@ -70,7 +74,7 @@ namespace SP_CSOM_DEMO2
                         Console.WriteLine("Enter Id of the record to be updated - \n");
                         int itemId2 = Convert.ToInt32(Console.ReadLine());
                         Console.WriteLine();
-                        _deleteRecord(itemId2);
+                        DeleteRecord(itemId2);
                         break;
                 }
             } while (choice <= 4);
@@ -79,10 +83,10 @@ namespace SP_CSOM_DEMO2
         /// <summary>
         /// 
         /// </summary>
-        private static void _retrieveRecords()
+        private static void RetrieveRecords()
         {
             ClientContext context = new ClientContext(ConfigurationManager.AppSettings["SPOSite"]);
-            List list = _initiateAuthentication(context);
+            List list = InitiateAuthentication(context);
             BasicConfigurator.Configure();
             try
             {
@@ -110,10 +114,10 @@ namespace SP_CSOM_DEMO2
         /// <summary>
         /// 
         /// </summary>
-        private static void _createRecord()
+        private static void CreateRecord()
         {
             ClientContext context = new ClientContext(ConfigurationManager.AppSettings["SPOSite"]);
-            List list = _initiateAuthentication(context);
+            List list = InitiateAuthentication(context);
             BasicConfigurator.Configure();
             try
             {
@@ -158,13 +162,13 @@ namespace SP_CSOM_DEMO2
         /// 
         /// </summary>
         /// <param name="id"></param>
-        private static void _updateRecord(int id)
+        private static void UpdateRecord(int id)
         {
             BasicConfigurator.Configure();
             try
             {
                 ClientContext context = new ClientContext(ConfigurationManager.AppSettings["SPOSite"]);
-                List list = _initiateAuthentication(context);
+                List list = InitiateAuthentication(context);
                 Console.WriteLine("Enter values: \n");
                 ListItem listItem = list.GetItemById(id);
                 Console.WriteLine("Enter Title: ");
@@ -205,13 +209,13 @@ namespace SP_CSOM_DEMO2
         /// 
         /// </summary>
         /// <param name="id"></param>
-        private static void _deleteRecord(int id)
+        private static void DeleteRecord(int id)
         {
             BasicConfigurator.Configure();
             try
             {
                 ClientContext context = new ClientContext(ConfigurationManager.AppSettings["SPOSite"]);
-                List list = _initiateAuthentication(context);
+                List list = InitiateAuthentication(context);
                 ListItem listItem = list.GetItemById(id);
                 listItem.DeleteObject();
                 context.ExecuteQuery();
@@ -226,7 +230,7 @@ namespace SP_CSOM_DEMO2
         /// 
         /// </summary>
         /// <returns></returns>
-        private static string _getSPOUserName()
+        private static string GetSPOUserName()
         {
             try
             {
@@ -241,7 +245,7 @@ namespace SP_CSOM_DEMO2
         /// 
         /// </summary>
         /// <returns></returns>
-        private static SecureString _getSPOSecureStringPassword()
+        private static SecureString GetSPOSecureStringPassword()
         {
             try
             {
@@ -262,17 +266,11 @@ namespace SP_CSOM_DEMO2
         /// </summary>
         /// <param name="ctx"></param>
         /// <returns></returns>
-        private static List _initiateAuthentication(ClientContext ctx)
+        private static List InitiateAuthentication(ClientContext ctx)
         {
             ClientContext context = ctx;
-
             context.AuthenticationMode = ClientAuthenticationMode.Default;
-            context.Credentials = new SharePointOnlineCredentials(_getSPOUserName(), _getSPOSecureStringPassword());
-
-            Web web = context.Web;
-            context.Load(web);
-            context.ExecuteQuery();
-            Console.WriteLine($"Website Title : {web.Title}\nWebsite Url : {web.Url}\n\n");
+            context.Credentials = new SharePointOnlineCredentials(GetSPOUserName(), GetSPOSecureStringPassword());
             List list = context.Web.Lists.GetByTitle(ConfigurationManager.AppSettings["SPOList"]);
             context.Load(list);
             context.ExecuteQuery();
