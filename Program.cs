@@ -6,26 +6,21 @@ using System.Security;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.SharePoint.Client;
+using log4net;
+using log4net.Config;
 
 namespace SP_CSOM_DEMO2
 {
     class Program
     {
+        private static readonly ILog Log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         static void Main(string[] args)
         {
-            ClientContext context = new ClientContext(ConfigurationManager.AppSettings["SPOSite"])
-            {
-                AuthenticationMode = ClientAuthenticationMode.Default,
-                Credentials = new SharePointOnlineCredentials(_getSPOUserName(), _getSPOSecureStringPassword())
-            };
-            Web web = context.Web;
-            context.Load(web);
-            context.ExecuteQuery();
-            Console.WriteLine($"Website Title : {web.Title}\nWebsite Url : {web.Url}\n\n");
-            List list = context.Web.Lists.GetByTitle(ConfigurationManager.AppSettings["SPOList"]);
-            context.Load(list);
-            context.ExecuteQuery();
+            ClientContext context = new ClientContext(ConfigurationManager.AppSettings["SPOSite"]);
+            List list = _initiateAuthentication(context);
             Console.WriteLine($"List name - {list.Title}\n\n");
+
+            BasicConfigurator.Configure();
 
             int choice;
             do
@@ -37,152 +32,219 @@ namespace SP_CSOM_DEMO2
                 switch (choice)
                 {
                     case 1:
-                        try
-                        {
-                            Console.WriteLine("Retrieve records - ");
-                            CamlQuery query = CamlQuery.CreateAllItemsQuery(100);
-                            ListItemCollection items = list.GetItems(query);
-                            context.Load(items);
-                            context.ExecuteQuery();
-                            foreach (ListItem listItem in items)
-                            {
-                                Console.WriteLine($"Name - {listItem["Title"]}");
-                                Console.WriteLine($"Email - {listItem["Email"]}");
-                                Console.WriteLine($"Contact - {listItem["Contact"]}");
-                                Console.WriteLine($"Subject - {(listItem["Subject"] as FieldLookupValue).LookupValue.ToString()}");
-                                Console.WriteLine($"Branch - {(listItem["Branch"] as FieldLookupValue).LookupValue.ToString()}");
-                                Console.WriteLine();
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            Console.WriteLine(e.Message);
-                        }
+                        Log.Info("Entering case 1 - _retrieveRecords()");
+                        _retrieveRecords();
                         break;
                     case 2:
-                        try
-                        {
-                            Console.WriteLine("Create new record - \n\n");
-                            ListItemCreationInformation itemCreateInfo = new ListItemCreationInformation();
-                            ListItem newItem = list.AddItem(itemCreateInfo);
-                            Console.WriteLine("Enter Title: ");
-                            newItem["Title"] = Console.ReadLine();
-                            Console.WriteLine("Enter Email: ");
-                            newItem["Email"] = Console.ReadLine();
-                            Console.WriteLine("Enter Contact: ");
-                            newItem["Contact"] = Console.ReadLine();
-                            Console.WriteLine("Enter Subject:");
-                            Console.WriteLine("               Choice 1: Electrical");
-                            Console.WriteLine("               Choice 2: Mechanical");
-                            Console.WriteLine("               Choice 3: Civil");
-                            Console.WriteLine("               Choice 4: Electronics and Communication");
-                            Console.WriteLine("               Choice 5: Computer Science");
-                            Console.WriteLine("               Choice 6: Bio-Technology");
-                            FieldLookupValue subjectId = new FieldLookupValue() { LookupId = Convert.ToInt32(Console.ReadLine()) };
-                            newItem["Subject"] = subjectId;
-                            Console.WriteLine("Enter Branch:");
-                            Console.WriteLine("              Choice 1: Kolkata");
-                            Console.WriteLine("              Choice 2: Delhi");
-                            Console.WriteLine("              Choice 3: Mumbai");
-                            Console.WriteLine("              Choice 4: Chennai");
-                            Console.WriteLine("              Choice 5: Bangalore");
-                            Console.WriteLine("              Choice 6: Ahmedabad");
-                            Console.WriteLine("              Choice 7: Kerala");
-                            FieldLookupValue branchId = new FieldLookupValue() { LookupId = Convert.ToInt32(Console.ReadLine()) };
-                            newItem["Branch"] = branchId;
-                            newItem.Update();
-                            context.ExecuteQuery();
-                            Console.WriteLine();
-                        }
-                        catch (Exception e)
-                        {
-                            Console.WriteLine(e.Message);
-                        }
+                        Log.Info("Entering case 2 - _createRecord()");
+                        _createRecord();
                         break;
                     case 3:
-                        try
+                        Log.Info("Entering case 3 - _updateRecord()");
+                        Console.WriteLine("Update a record - \n\n");
+                        Console.WriteLine("List view\n\n");
+                        CamlQuery query3 = CamlQuery.CreateAllItemsQuery(100);
+                        ListItemCollection items3 = list.GetItems(query3);
+                        context.Load(items3);
+                        context.ExecuteQuery();
+                        Console.WriteLine("Id     Title");
+                        foreach (ListItem item in items3)
                         {
-                            Console.WriteLine("Update a record - \n\n");
-                            Console.WriteLine("List view\n\n");
-                            CamlQuery query = CamlQuery.CreateAllItemsQuery(100);
-                            ListItemCollection items = list.GetItems(query);
-                            context.Load(items);
-                            context.ExecuteQuery();
-                            Console.WriteLine("Id     Title");
-                            foreach (ListItem item in items)
-                            {
-                                Console.WriteLine($"{item.Id}   {item["Title"]}\n");
-                            }
-                            Console.WriteLine("Enter Id of the record to be updated - \n");
-                            int itemId = Convert.ToInt32(Console.ReadLine());
-                            Console.WriteLine();
-                            Console.WriteLine("Enter values: \n");
-                            ListItem listItem = list.GetItemById(itemId);
-                            Console.WriteLine("Enter Title: ");
-                            listItem["Title"] = Console.ReadLine();
-                            Console.WriteLine("Enter Email: ");
-                            listItem["Email"] = Console.ReadLine();
-                            Console.WriteLine("Enter Contact: ");
-                            listItem["Contact"] = Console.ReadLine();
-                            Console.WriteLine("Enter Subject:");
-                            Console.WriteLine("               Choice 1: Electrical");
-                            Console.WriteLine("               Choice 2: Mechanical");
-                            Console.WriteLine("               Choice 3: Civil");
-                            Console.WriteLine("               Choice 4: Electronics and Communication");
-                            Console.WriteLine("               Choice 5: Computer Science");
-                            Console.WriteLine("               Choice 6: Bio-Technology");
-                            FieldLookupValue subjectId = new FieldLookupValue() { LookupId = Convert.ToInt32(Console.ReadLine()) };
-                            listItem["Subject"] = subjectId;
-                            Console.WriteLine("Enter Branch:");
-                            Console.WriteLine("              Choice 1: Kolkata");
-                            Console.WriteLine("              Choice 2: Delhi");
-                            Console.WriteLine("              Choice 3: Mumbai");
-                            Console.WriteLine("              Choice 4: Chennai");
-                            Console.WriteLine("              Choice 5: Bangalore");
-                            Console.WriteLine("              Choice 6: Ahmedabad");
-                            Console.WriteLine("              Choice 7: Kerala");
-                            FieldLookupValue branchId = new FieldLookupValue() { LookupId = Convert.ToInt32(Console.ReadLine()) };
-                            listItem["Branch"] = branchId;
-                            listItem.Update();
-                            context.ExecuteQuery();
-                            Console.WriteLine();
+                            Console.WriteLine($"{item.Id}   {item["Title"]}\n");
                         }
-                        catch (Exception e)
-                        {
-                            Console.WriteLine(e.Message);
-                        }
+                        Console.WriteLine("Enter Id of the record to be updated - \n");
+                        int itemId1 = Convert.ToInt32(Console.ReadLine());
+                        Console.WriteLine();
+                        _updateRecord(itemId1);
+
                         break;
                     case 4:
-                        try
+                        Log.Info("Entering case 4 - _deleteRecord()");
+                        Console.WriteLine("Delete a record - \n\n");
+                        Console.WriteLine("List view\n\n");
+                        CamlQuery query4 = CamlQuery.CreateAllItemsQuery(100);
+                        ListItemCollection items4 = list.GetItems(query4);
+                        context.Load(items4);
+                        context.ExecuteQuery();
+                        Console.WriteLine("Id     Title");
+                        foreach (ListItem item in items4)
                         {
-                            Console.WriteLine("Delete a record - \n\n");
-                            Console.WriteLine("List view\n\n");
-                            CamlQuery query = CamlQuery.CreateAllItemsQuery(100);
-                            ListItemCollection items = list.GetItems(query);
-                            context.Load(items);
-                            context.ExecuteQuery();
-                            Console.WriteLine("Id     Title");
-                            foreach (ListItem item in items)
-                            {
-                                Console.WriteLine($"{item.Id}   {item["Title"]}\n");
-                            }
-                            Console.WriteLine("Enter Id of the record to be updated - \n");
-                            int itemId = Convert.ToInt32(Console.ReadLine());
-                            Console.WriteLine();
-                            ListItem listItem = list.GetItemById(itemId);
-                            listItem.DeleteObject();
-                            context.ExecuteQuery();
+                            Console.WriteLine($"{item.Id}   {item["Title"]}\n");
                         }
-                        catch (Exception e)
-                        {
-                            Console.WriteLine(e.Message);
-                        }
+                        Console.WriteLine("Enter Id of the record to be updated - \n");
+                        int itemId2 = Convert.ToInt32(Console.ReadLine());
+                        Console.WriteLine();
+                        _deleteRecord(itemId2);
                         break;
                 }
             } while (choice <= 4);
             Console.ReadLine();
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        private static void _retrieveRecords()
+        {
+            ClientContext context = new ClientContext(ConfigurationManager.AppSettings["SPOSite"]);
+            List list = _initiateAuthentication(context);
+            BasicConfigurator.Configure();
+            try
+            {
+                Console.WriteLine("Retrieve records - ");
+                CamlQuery query = CamlQuery.CreateAllItemsQuery(100);
+                ListItemCollection items = list.GetItems(query);
+                context.Load(items);
+                context.ExecuteQuery();
+                foreach (ListItem listItem in items)
+                {
+                    Console.WriteLine($"Name - {listItem["Title"]}");
+                    Console.WriteLine($"Email - {listItem["Email"]}");
+                    Console.WriteLine($"Contact - {listItem["Contact"]}");
+                    Console.WriteLine($"Subject - {(listItem["Subject"] as FieldLookupValue).LookupValue}");
+                    Console.WriteLine($"Branch - {(listItem["Branch"] as FieldLookupValue).LookupValue}");
+                    Console.WriteLine();
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                Log.Error("Error Message: " + e.Message.ToString(), e);
+            }
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        private static void _createRecord()
+        {
+            ClientContext context = new ClientContext(ConfigurationManager.AppSettings["SPOSite"]);
+            List list = _initiateAuthentication(context);
+            BasicConfigurator.Configure();
+            try
+            {
+                Console.WriteLine("Create new record - \n\n");
+                ListItemCreationInformation itemCreateInfo = new ListItemCreationInformation();
+                ListItem newItem = list.AddItem(itemCreateInfo);
+                Console.WriteLine("Enter Title: ");
+                newItem["Title"] = Console.ReadLine();
+                Console.WriteLine("Enter Email: ");
+                newItem["Email"] = Console.ReadLine();
+                Console.WriteLine("Enter Contact: ");
+                newItem["Contact"] = Console.ReadLine();
+                Console.WriteLine("Enter Subject:");
+                Console.WriteLine("               Choice 1: Electrical");
+                Console.WriteLine("               Choice 2: Mechanical");
+                Console.WriteLine("               Choice 3: Civil");
+                Console.WriteLine("               Choice 4: Electronics and Communication");
+                Console.WriteLine("               Choice 5: Computer Science");
+                Console.WriteLine("               Choice 6: Bio-Technology");
+                FieldLookupValue subjectId = new FieldLookupValue() { LookupId = Convert.ToInt32(Console.ReadLine()) };
+                newItem["Subject"] = subjectId; Console.WriteLine("Enter Branch:");
+                Console.WriteLine("              Choice 1: Kolkata");
+                Console.WriteLine("              Choice 2: Delhi");
+                Console.WriteLine("              Choice 3: Mumbai");
+                Console.WriteLine("              Choice 4: Chennai");
+                Console.WriteLine("              Choice 5: Bangalore");
+                Console.WriteLine("              Choice 6: Ahmedabad");
+                Console.WriteLine("              Choice 7: Kerala");
+                FieldLookupValue branchId = new FieldLookupValue() { LookupId = Convert.ToInt32(Console.ReadLine()) };
+                newItem["Branch"] = branchId;
+                newItem.Update();
+                context.ExecuteQuery();
+                Console.WriteLine();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                Log.Error("Error Message: " + e.Message.ToString(), e);
+            }
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        private static void _updateRecord(int id)
+        {
+            BasicConfigurator.Configure();
+            try
+            {
+                ClientContext context = new ClientContext(ConfigurationManager.AppSettings["SPOSite"]);
+                List list = _initiateAuthentication(context);
+                Console.WriteLine("Enter values: \n");
+                ListItem listItem = list.GetItemById(id);
+                Console.WriteLine("Enter Title: ");
+                listItem["Title"] = Console.ReadLine();
+                Console.WriteLine("Enter Email: ");
+                listItem["Email"] = Console.ReadLine();
+                Console.WriteLine("Enter Contact: ");
+                listItem["Contact"] = Console.ReadLine();
+                Console.WriteLine("Enter Subject:");
+                Console.WriteLine("               Choice 1: Electrical");
+                Console.WriteLine("               Choice 2: Mechanical");
+                Console.WriteLine("               Choice 3: Civil");
+                Console.WriteLine("               Choice 4: Electronics and Communication");
+                Console.WriteLine("               Choice 5: Computer Science");
+                Console.WriteLine("               Choice 6: Bio-Technology");
+                FieldLookupValue subjectId = new FieldLookupValue() { LookupId = Convert.ToInt32(Console.ReadLine()) };
+                listItem["Subject"] = subjectId;
+                Console.WriteLine("Enter Branch:");
+                Console.WriteLine("              Choice 1: Kolkata");
+                Console.WriteLine("              Choice 2: Delhi");
+                Console.WriteLine("              Choice 3: Mumbai");
+                Console.WriteLine("              Choice 4: Chennai");
+                Console.WriteLine("              Choice 5: Bangalore");
+                Console.WriteLine("              Choice 6: Ahmedabad");
+                Console.WriteLine("              Choice 7: Kerala");
+                FieldLookupValue branchId = new FieldLookupValue() { LookupId = Convert.ToInt32(Console.ReadLine()) };
+                listItem["Branch"] = branchId;
+                listItem.Update(); context.ExecuteQuery();
+                Console.WriteLine();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                Log.Error("Error Message: " + e.Message.ToString(), e);
+            }
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        private static void _deleteRecord(int id)
+        {
+            BasicConfigurator.Configure();
+            try
+            {
+                ClientContext context = new ClientContext(ConfigurationManager.AppSettings["SPOSite"]);
+                List list = _initiateAuthentication(context);
+                ListItem listItem = list.GetItemById(id);
+                listItem.DeleteObject();
+                context.ExecuteQuery();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                Log.Error("Error Message: " + e.Message.ToString(), e);
+            }
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        private static string _getSPOUserName()
+        {
+            try
+            {
+                return ConfigurationManager.AppSettings["SPOAccount"];
+            }
+            catch
+            {
+                throw;
+            }
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         private static SecureString _getSPOSecureStringPassword()
         {
             try
@@ -199,17 +261,26 @@ namespace SP_CSOM_DEMO2
                 throw;
             }
         }
-
-        private static string _getSPOUserName()
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <returns></returns>
+        private static List _initiateAuthentication(ClientContext ctx)
         {
-            try
-            {
-                return ConfigurationManager.AppSettings["SPOAccount"];
-            }
-            catch
-            {
-                throw;
-            }
+            ClientContext context = ctx;
+
+            context.AuthenticationMode = ClientAuthenticationMode.Default;
+            context.Credentials = new SharePointOnlineCredentials(_getSPOUserName(), _getSPOSecureStringPassword());
+
+            Web web = context.Web;
+            context.Load(web);
+            context.ExecuteQuery();
+            Console.WriteLine($"Website Title : {web.Title}\nWebsite Url : {web.Url}\n\n");
+            List list = context.Web.Lists.GetByTitle(ConfigurationManager.AppSettings["SPOList"]);
+            context.Load(list);
+            context.ExecuteQuery();
+            return (list);
         }
     }
 }
