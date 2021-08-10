@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Configuration;
-using System.Linq;
 using System.Security;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.SharePoint.Client;
 using log4net;
 using log4net.Config;
