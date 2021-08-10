@@ -81,7 +81,7 @@ namespace SP_CSOM_DEMO2
             Console.ReadLine();
         }
         /// <summary>
-        /// 
+        ///         Retrieves SharePoint Online List Items.
         /// </summary>
         private static void RetrieveRecords()
         {
@@ -112,7 +112,7 @@ namespace SP_CSOM_DEMO2
             }
         }
         /// <summary>
-        /// 
+        ///         Creates new SharePoint Online List Item.
         /// </summary>
         private static void CreateRecord()
         {
@@ -159,9 +159,12 @@ namespace SP_CSOM_DEMO2
             }
         }
         /// <summary>
-        /// 
+        ///         Takes Id of the SharePoint Online List Item to be updated.
+        ///         Updates SharePoint Online List item with the Id entered.
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="id">
+        ///         SharePoint Online List Item
+        /// </param>
         private static void UpdateRecord(int id)
         {
             BasicConfigurator.Configure();
@@ -206,9 +209,12 @@ namespace SP_CSOM_DEMO2
             }
         }
         /// <summary>
-        /// 
+        ///         Takes Id of the SharePoint Online List Item to be deleted.
+        ///         Deletes SharePoint Online List item with the Id entered.
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="id">
+        ///         SharePoint List Item Id to be deleted.
+        /// </param>
         private static void DeleteRecord(int id)
         {
             BasicConfigurator.Configure();
@@ -227,9 +233,12 @@ namespace SP_CSOM_DEMO2
             }
         }
         /// <summary>
-        /// 
+        ///         Feteches value of SharePoint Online site username.
+        ///         Returns a string.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>
+        ///         Returns SharePoint Online site username as string.
+        /// </returns>
         private static string GetSPOUserName()
         {
             try
@@ -242,9 +251,12 @@ namespace SP_CSOM_DEMO2
             }
         }
         /// <summary>
-        /// 
+        ///         Feteches value of SharePoint Online site password from app config.
+        ///         Returns a SecureString object.
         /// </summary>
-        /// <returns></returns>
+        /// <returns name="secureString">
+        ///         System.Security.SecureString class instance.
+        /// </returns>
         private static SecureString GetSPOSecureStringPassword()
         {
             try
@@ -262,10 +274,16 @@ namespace SP_CSOM_DEMO2
             }
         }
         /// <summary>
-        /// 
+        ///         Takes SharePoint Online Site ClientContext as parameter.
+        ///         Fetches SharePoint Online credentials from app config and initiates authentication.
+        ///         Returns an object of Microsoft.Client.List.
         /// </summary>
-        /// <param name="ctx"></param>
-        /// <returns></returns>
+        /// <param name="ctx">
+        ///         SharePoint Online Site ClientContext.
+        /// </param>
+        /// <returns name="list">
+        ///         Microsoft.SharePoint.Client.List class instance.
+        /// </returns>
         private static List InitiateAuthentication(ClientContext ctx)
         {
             ClientContext context = ctx;
@@ -274,7 +292,7 @@ namespace SP_CSOM_DEMO2
             List list = context.Web.Lists.GetByTitle(ConfigurationManager.AppSettings["SPOList"]);
             context.Load(list);
             context.ExecuteQuery();
-            return (list);
+            return list;
         }
     }
 }
