@@ -138,7 +138,8 @@ namespace SP_CSOM_DEMO2
                 Console.WriteLine("               Choice 5: Computer Science");
                 Console.WriteLine("               Choice 6: Bio-Technology");
                 FieldLookupValue subjectId = new FieldLookupValue() { LookupId = Convert.ToInt32(Console.ReadLine()) };
-                newItem["Subject"] = subjectId; Console.WriteLine("Enter Branch:");
+                newItem["Subject"] = subjectId;
+                Console.WriteLine("Enter Branch:");
                 Console.WriteLine("              Choice 1: Kolkata");
                 Console.WriteLine("              Choice 2: Delhi");
                 Console.WriteLine("              Choice 3: Mumbai");
@@ -254,7 +255,7 @@ namespace SP_CSOM_DEMO2
         ///         Feteches value of SharePoint Online site password from app config.
         ///         Returns a SecureString object.
         /// </summary>
-        /// <returns name="secureString">
+        /// <returns>
         ///         System.Security.SecureString class instance.
         /// </returns>
         private static SecureString GetSPOSecureStringPassword()
@@ -281,7 +282,7 @@ namespace SP_CSOM_DEMO2
         /// <param name="ctx">
         ///         SharePoint Online Site ClientContext.
         /// </param>
-        /// <returns name="list">
+        /// <returns>
         ///         Microsoft.SharePoint.Client.List class instance.
         /// </returns>
         private static List InitiateAuthentication(ClientContext ctx)
