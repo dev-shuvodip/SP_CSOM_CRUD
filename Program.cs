@@ -145,12 +145,12 @@ namespace SP_CSOM_DEMO2
                 List list = InitiateAuthentication(context);
                 Console.WriteLine("Update a record - \n\n");
                 Console.WriteLine("List view\n\n");
-                CamlQuery query3 = CamlQuery.CreateAllItemsQuery(100);
-                ListItemCollection items3 = list.GetItems(query3);
-                context.Load(items3);
+                CamlQuery query = CamlQuery.CreateAllItemsQuery(100);
+                ListItemCollection items = list.GetItems(query);
+                context.Load(items);
                 context.ExecuteQuery();
                 Console.WriteLine("Id     Title");
-                foreach (ListItem item in items3)
+                foreach (ListItem item in items)
                 {
                     Console.WriteLine($"{item.Id}   {item["Title"]}\n");
                 }
@@ -207,12 +207,12 @@ namespace SP_CSOM_DEMO2
                 List list = InitiateAuthentication(context);
                 Console.WriteLine("Delete a record - \n\n");
                 Console.WriteLine("List view\n\n");
-                CamlQuery query4 = CamlQuery.CreateAllItemsQuery(100);
-                ListItemCollection items4 = list.GetItems(query4);
-                context.Load(items4);
+                CamlQuery query = CamlQuery.CreateAllItemsQuery(100);
+                ListItemCollection items = list.GetItems(query);
+                context.Load(items);
                 context.ExecuteQuery();
                 Console.WriteLine("Id     Title");
-                foreach (ListItem item in items4)
+                foreach (ListItem item in items)
                 {
                     Console.WriteLine($"{item.Id}   {item["Title"]}\n");
                 }
