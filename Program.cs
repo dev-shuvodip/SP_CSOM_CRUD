@@ -10,9 +10,14 @@ namespace SP_CSOM_DEMO2
     class Program
     {
         private static readonly ILog Log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ClientContext context = new ClientContext(ConfigurationManager.AppSettings["SPOSite"]);
+
+        /// <summary>
+        ///         Performs CRUD operations on SharePoint Online List using SharePoint Client Side Object Model.
+        /// </summary>
+        /// <param name="args"></param>
         static void Main(string[] args)
         {
-            ClientContext context = new ClientContext(ConfigurationManager.AppSettings["SPOSite"]);
             List list = InitiateAuthentication(context);
             Web web = context.Web;
             context.Load(web);
@@ -41,40 +46,11 @@ namespace SP_CSOM_DEMO2
                         break;
                     case 3:
                         Log.Info("Entering case 3");
-                        Console.WriteLine("Update a record - \n\n");
-                        Console.WriteLine("List view\n\n");
-                        CamlQuery query3 = CamlQuery.CreateAllItemsQuery(100);
-                        ListItemCollection items3 = list.GetItems(query3);
-                        context.Load(items3);
-                        context.ExecuteQuery();
-                        Console.WriteLine("Id     Title");
-                        foreach (ListItem item in items3)
-                        {
-                            Console.WriteLine($"{item.Id}   {item["Title"]}\n");
-                        }
-                        Console.WriteLine("Enter Id of the record to be updated - \n");
-                        int itemId1 = Convert.ToInt32(Console.ReadLine());
-                        Console.WriteLine();
-                        UpdateRecord(itemId1);
-
+                        UpdateRecord();
                         break;
                     case 4:
                         Log.Info("Entering case 4");
-                        Console.WriteLine("Delete a record - \n\n");
-                        Console.WriteLine("List view\n\n");
-                        CamlQuery query4 = CamlQuery.CreateAllItemsQuery(100);
-                        ListItemCollection items4 = list.GetItems(query4);
-                        context.Load(items4);
-                        context.ExecuteQuery();
-                        Console.WriteLine("Id     Title");
-                        foreach (ListItem item in items4)
-                        {
-                            Console.WriteLine($"{item.Id}   {item["Title"]}\n");
-                        }
-                        Console.WriteLine("Enter Id of the record to be updated - \n");
-                        int itemId2 = Convert.ToInt32(Console.ReadLine());
-                        Console.WriteLine();
-                        DeleteRecord(itemId2);
+                        DeleteRecord();
                         break;
                 }
             } while (choice <= 4);
@@ -85,9 +61,7 @@ namespace SP_CSOM_DEMO2
         /// </summary>
         private static void RetrieveRecords()
         {
-            ClientContext context = new ClientContext(ConfigurationManager.AppSettings["SPOSite"]);
             List list = InitiateAuthentication(context);
-            BasicConfigurator.Configure();
             try
             {
                 Console.WriteLine("Retrieve records - ");
@@ -116,9 +90,7 @@ namespace SP_CSOM_DEMO2
         /// </summary>
         private static void CreateRecord()
         {
-            ClientContext context = new ClientContext(ConfigurationManager.AppSettings["SPOSite"]);
             List list = InitiateAuthentication(context);
-            BasicConfigurator.Configure();
             try
             {
                 Console.WriteLine("Create new record - \n\n");
@@ -166,15 +138,27 @@ namespace SP_CSOM_DEMO2
         /// <param name="id">
         ///         SharePoint Online List Item
         /// </param>
-        private static void UpdateRecord(int id)
+        private static void UpdateRecord()
         {
-            BasicConfigurator.Configure();
             try
             {
-                ClientContext context = new ClientContext(ConfigurationManager.AppSettings["SPOSite"]);
                 List list = InitiateAuthentication(context);
+                Console.WriteLine("Update a record - \n\n");
+                Console.WriteLine("List view\n\n");
+                CamlQuery query3 = CamlQuery.CreateAllItemsQuery(100);
+                ListItemCollection items3 = list.GetItems(query3);
+                context.Load(items3);
+                context.ExecuteQuery();
+                Console.WriteLine("Id     Title");
+                foreach (ListItem item in items3)
+                {
+                    Console.WriteLine($"{item.Id}   {item["Title"]}\n");
+                }
+                Console.WriteLine("Enter Id of the record to be updated - \n");
+                int itemId = Convert.ToInt32(Console.ReadLine());
+                Console.WriteLine();
                 Console.WriteLine("Enter values: \n");
-                ListItem listItem = list.GetItemById(id);
+                ListItem listItem = list.GetItemById(itemId);
                 Console.WriteLine("Enter Title: ");
                 listItem["Title"] = Console.ReadLine();
                 Console.WriteLine("Enter Email: ");
@@ -216,14 +200,26 @@ namespace SP_CSOM_DEMO2
         /// <param name="id">
         ///         SharePoint List Item Id to be deleted.
         /// </param>
-        private static void DeleteRecord(int id)
+        private static void DeleteRecord()
         {
-            BasicConfigurator.Configure();
             try
             {
-                ClientContext context = new ClientContext(ConfigurationManager.AppSettings["SPOSite"]);
                 List list = InitiateAuthentication(context);
-                ListItem listItem = list.GetItemById(id);
+                Console.WriteLine("Delete a record - \n\n");
+                Console.WriteLine("List view\n\n");
+                CamlQuery query4 = CamlQuery.CreateAllItemsQuery(100);
+                ListItemCollection items4 = list.GetItems(query4);
+                context.Load(items4);
+                context.ExecuteQuery();
+                Console.WriteLine("Id     Title");
+                foreach (ListItem item in items4)
+                {
+                    Console.WriteLine($"{item.Id}   {item["Title"]}\n");
+                }
+                Console.WriteLine("Enter Id of the record to be updated - \n");
+                int itemId = Convert.ToInt32(Console.ReadLine());
+                Console.WriteLine();
+                ListItem listItem = list.GetItemById(itemId);
                 listItem.DeleteObject();
                 context.ExecuteQuery();
             }
