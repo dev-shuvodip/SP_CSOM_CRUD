@@ -56,6 +56,7 @@ namespace SP_CSOM_DEMO2
             } while (choice <= 4);
             Console.ReadLine();
         }
+
         /// <summary>
         ///         Retrieves SharePoint Online List Items.
         /// </summary>
@@ -131,13 +132,11 @@ namespace SP_CSOM_DEMO2
                 Log.Error("Error Message: " + e.Message.ToString(), e);
             }
         }
+
         /// <summary>
         ///         Takes Id of the SharePoint Online List Item to be updated.
         ///         Updates SharePoint Online List item with the Id entered.
         /// </summary>
-        /// <param name="id">
-        ///         SharePoint Online List Item
-        /// </param>
         private static void UpdateRecord()
         {
             try
@@ -193,13 +192,11 @@ namespace SP_CSOM_DEMO2
                 Log.Error("Error Message: " + e.Message.ToString(), e);
             }
         }
+
         /// <summary>
         ///         Takes Id of the SharePoint Online List Item to be deleted.
         ///         Deletes SharePoint Online List item with the Id entered.
         /// </summary>
-        /// <param name="id">
-        ///         SharePoint List Item Id to be deleted.
-        /// </param>
         private static void DeleteRecord()
         {
             try
@@ -229,6 +226,7 @@ namespace SP_CSOM_DEMO2
                 Log.Error("Error Message: " + e.Message.ToString(), e);
             }
         }
+
         /// <summary>
         ///         Feteches value of SharePoint Online site username.
         ///         Returns a string.
@@ -247,6 +245,7 @@ namespace SP_CSOM_DEMO2
                 throw;
             }
         }
+
         /// <summary>
         ///         Feteches value of SharePoint Online site password from app config.
         ///         Returns a SecureString object.
@@ -270,6 +269,7 @@ namespace SP_CSOM_DEMO2
                 throw;
             }
         }
+
         /// <summary>
         ///         Takes SharePoint Online Site ClientContext as parameter.
         ///         Fetches SharePoint Online credentials from app config and initiates authentication.
